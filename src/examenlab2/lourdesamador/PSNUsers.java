@@ -70,26 +70,15 @@ public class PSNUsers {
         long pos = users.search(username);
         if (pos != -1) {
             System.out.println("Usuario encontrado. Posicion: " + pos);
-            boolean isActive = users.isActive(pos);
-            System.out.println("Usuario Activo: " + isActive);
-            if (isActive) {
-                raf.seek(pos + 2 * Integer.BYTES);
-                raf.writeInt(0);
-                raf.writeBoolean(false);
-                users.remove(username);
-                System.out.println("Usuario desactivado exitosamente");
-            } else {
-                System.out.println("El usuario ya esta desactivado");
-            }
+            raf.seek(pos + 2 * Integer.BYTES);
+            raf.writeInt(0);
+            raf.writeBoolean(false);
+            users.remove(username);
+            System.out.println("Usuario desactivado exitosamente");
         } else {
             System.out.println("El usuario no existe");
 
         }
-    }
-
-    public boolean isActive(long pos) throws IOException {
-        raf.seek(pos + 2 * Integer.BYTES);
-        return raf.readBoolean();
     }
 
     public void addTrophieTo(String username, String trophyGame, String trophyName, Trophy type) throws IOException {
@@ -102,11 +91,11 @@ public class PSNUsers {
             raf.writeUTF(trophyGame);
             raf.writeUTF(trophyName);
             raf.writeLong(System.currentTimeMillis());
-            raf.writeInt(trophyCount + 1);
-            raf.writeInt(raf.readInt() + type.points);
+            raf.writeInt(type.points);
         }
     }
-
+    
+    
     public void playerInfo(String username) throws IOException {
         long pos = users.search(username);
         if (pos != -1) {

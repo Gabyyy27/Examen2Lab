@@ -17,7 +17,6 @@ import javax.swing.JOptionPane;
 public class Frame extends javax.swing.JFrame {
 
     private PSNUsers psnUsers;
-    private HashTable hashtable;
 
     /**
      * Creates new form Frame
@@ -25,7 +24,7 @@ public class Frame extends javax.swing.JFrame {
     public Frame() throws IOException {
         initComponents();
         psnUsers = new PSNUsers("psn.dat");
-        hashtable = new HashTable();
+
     }
 
     /**
@@ -39,7 +38,7 @@ public class Frame extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        addTrophy = new javax.swing.JButton();
         DesActivarUser = new javax.swing.JButton();
         SearchUser = new javax.swing.JButton();
 
@@ -54,7 +53,12 @@ public class Frame extends javax.swing.JFrame {
             }
         });
 
-        jButton2.setText("AGREGAR TROFEO");
+        addTrophy.setText("AGREGAR TROFEO");
+        addTrophy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addTrophyActionPerformed(evt);
+            }
+        });
 
         DesActivarUser.setText("DESACTIVAR USUARIO");
         DesActivarUser.addActionListener(new java.awt.event.ActionListener() {
@@ -87,7 +91,7 @@ public class Frame extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(161, 161, 161)
-                        .addComponent(jButton2))
+                        .addComponent(addTrophy))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(186, 186, 186)
                         .addComponent(SearchUser)))
@@ -101,7 +105,7 @@ public class Frame extends javax.swing.JFrame {
                 .addGap(48, 48, 48)
                 .addComponent(DesActivarUser)
                 .addGap(35, 35, 35)
-                .addComponent(jButton2)
+                .addComponent(addTrophy)
                 .addGap(18, 18, 18)
                 .addComponent(SearchUser)
                 .addContainerGap(78, Short.MAX_VALUE))
@@ -140,14 +144,14 @@ public class Frame extends javax.swing.JFrame {
         String username = JOptionPane.showInputDialog(null, "Ingrese un username: ", "Desactivar Usuario", JOptionPane.QUESTION_MESSAGE);
         if (username != null && !username.isEmpty()) {
             try {
-                
+
                 long pos = psnUsers.users.search(username);
-                
+
                 if (pos != -1) {
-                    
-                        psnUsers.deactiveUser(username);
-                        JOptionPane.showMessageDialog(null, "Usuario desactivado exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
-                
+
+                    psnUsers.deactiveUser(username);
+                    JOptionPane.showMessageDialog(null, "Usuario desactivado exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+
                 } else {
                     JOptionPane.showMessageDialog(null, "El usuario no existe", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -167,15 +171,9 @@ public class Frame extends javax.swing.JFrame {
             try {
                 long pos = psnUsers.users.search(username);
                 if (pos != -1) {
-                    boolean isActive = psnUsers.isActive(pos);
-                    if (isActive) {
-                        psnUsers.playerInfo(username);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "El usuario esta desactivado", "Aviso", JOptionPane.WARNING_MESSAGE);
-                    }
+                    psnUsers.playerInfo(username);
                 } else {
                     JOptionPane.showMessageDialog(null, "El usuario no existe", "Error", JOptionPane.ERROR_MESSAGE);
-
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -188,6 +186,33 @@ public class Frame extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_SearchUserActionPerformed
+
+    private void addTrophyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTrophyActionPerformed
+        String username = JOptionPane.showInputDialog(null, "Ingrese un username: ", "AGREGAR TROFEO", JOptionPane.QUESTION_MESSAGE);
+        if (username != null && !username.isEmpty()) {
+            try {
+                long pos = psnUsers.users.search(username);
+                if (pos != -1) {
+                    String trophyGame = JOptionPane.showInputDialog(null, "Ingrese el nombre del juego del trofeo: ", "AGREGAR TROFEO", JOptionPane.QUESTION_MESSAGE);
+                    String trophyName = JOptionPane.showInputDialog(null, "Ingrese el nombre del trofeo: ", "AGREGAR TROFEO", JOptionPane.QUESTION_MESSAGE);
+                    Trophy type = selectTrophyType();
+
+                    psnUsers.addTrophieTo(username, trophyGame, trophyName, type);
+                    JOptionPane.showMessageDialog(null, "Trofeo agregado exitosamente", "Exito", JOptionPane.INFORMATION_MESSAGE);
+
+                } else {
+                    JOptionPane.showMessageDialog(null, "El usuario no existe", "Error", JOptionPane.ERROR_MESSAGE);
+
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Error al agregar el trofeo", "Error", JOptionPane.ERROR_MESSAGE);
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Nombre de usuario no válido", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_addTrophyActionPerformed
 
     /**
      * @param args the command line arguments
@@ -231,8 +256,27 @@ public class Frame extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton DesActivarUser;
     private javax.swing.JButton SearchUser;
+    private javax.swing.JButton addTrophy;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
+
+    private Trophy selectTrophyType() {
+            String[] options = {" PLATINO", "ORO", "PLATA", "BRONCE"};
+        int choice = JOptionPane.showOptionDialog(null,"Seleccione el tipo de trofeo:","Tipo de Trofeo",
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+        switch (choice){
+            case 0:
+             return Trophy.PLATINO;
+             case 1:
+             return Trophy.ORO;
+             case 2:
+             return Trophy.PLATA;
+             case 3:
+             return Trophy.BRONCE;
+             default:
+             return Trophy.BRONCE;
+                   
+        }
+    }
 }
