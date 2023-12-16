@@ -5,6 +5,9 @@
  */
 package examenlab2.lourdesamador;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author porti
@@ -14,10 +17,12 @@ public class Entry {
     String username;
     long pos;
     Entry next;
+    List<Trophy> trophies;
     
     public Entry(String username, long pos){
         this.username=username;
         this.pos=pos;
         this.next=null;
+        this.trophies= new ArrayList<>();
     }
 }

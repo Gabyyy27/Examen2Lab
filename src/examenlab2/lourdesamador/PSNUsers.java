@@ -85,35 +85,63 @@ public class PSNUsers {
         long pos = users.search(username);
         if (pos != -1) {
             raf.seek(pos);
+
+            String currentUsername = raf.readUTF();
             int trophyCount = raf.readInt();
-            raf.writeInt(trophyCount + 1);
+            int points = raf.readInt();
+
+            long currentPosition = raf.getFilePointer();
+
             raf.writeUTF(username);
             raf.writeUTF(trophyGame);
             raf.writeUTF(trophyName);
-            raf.writeLong(System.currentTimeMillis());
+            raf.writeUTF(getCurrentDate());
+
+            raf.seek(currentPosition);
+            raf.writeInt(trophyCount + 1);
+
             raf.writeInt(type.points);
+
         }
     }
     
-    
+    private String getCurrentDate(){
+        SimpleDateFormat sdf = new SimpleDateFormat("  dd - MM - yyyy  HH:mm");
+        return sdf.format(new Date());
+    }
+
     public void playerInfo(String username) throws IOException {
         long pos = users.search(username);
         if (pos != -1) {
             raf.seek(pos);
 
             StringBuilder userInfo = new StringBuilder();
-            userInfo.append("Username: ").append(raf.readUTF()).append("\n");
-            int trophyCount = raf.readInt();
-            userInfo.append("Trofeos: ").append(trophyCount).append("\n");
-            userInfo.append("Puntos: ").append(raf.readInt()).append("\n");
+            try {
+                userInfo.append("Username: ").append(raf.readUTF()).append("\n");
+                int trophyCount = raf.readInt();
+                userInfo.append("Trofeos: ").append(trophyCount).append("\n");
+                userInfo.append("Puntos: ").append(raf.readInt()).append("\n");
 
-            for (int i = 0; i < trophyCount; i++) {
-                userInfo.append("Fecha: ").append(raf.readUTF()).append("\n");
-                userInfo.append("Tipo: ").append(raf.readUTF()).append("\n");
-                userInfo.append("Juego: ").append(raf.readUTF()).append("\n");
-                userInfo.append("Descripcion: ").append(raf.readUTF()).append("\n");
+                for (int i = 0; i < trophyCount; i++) {
+
+                    if (raf.getFilePointer() < raf.length()) {
+
+                        userInfo.append("Fecha: ").append(raf.readUTF()).append("\n");
+                        userInfo.append("Tipo: ").append(raf.readUTF()).append("\n");
+                        userInfo.append("Juego: ").append(raf.readUTF()).append("\n");
+                        userInfo.append("Descripcion: ").append(raf.readUTF()).append("\n");
+                    } else {
+                        break;
+                    }
+                }
+                JOptionPane.showMessageDialog(null, userInfo.toString(), "Informacion del Usuario", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error al leer la informacion del usuario", "Error", JOptionPane.ERROR_MESSAGE);
+
             }
-            JOptionPane.showMessageDialog(null, userInfo.toString(), "Informacion del Usuario", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(null, "El usuario no existe", "Error", JOptionPane.ERROR_MESSAGE);
+
         }
     }
 }
